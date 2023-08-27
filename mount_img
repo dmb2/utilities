@@ -1,0 +1,23 @@
+#!/bin/bash
+
+function mount_loop_img(){
+    local img_name=$1
+    file "$img_name"
+    sudo losetup -f "$img_name"
+    losetup -j "$img_name"
+    local device=$(losetup -j "$img_name" | awk -F':' '{print $1}')
+    local base=$(basename "$img_name" .img)
+    sudo mkdir -p "/media/$base"
+    sudo mount $device "/media/$base"
+
+}
+
+function main(){
+    local img_name="$1"
+    mount_loop_img "$img_name"
+    local base=$(basename "$img_name" .img)
+    local sub_img=$(ls "/media/$base/"*.img)
+    mount_loop_img "$sub_img"
+}
+
+main "$@"

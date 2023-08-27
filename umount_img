@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+function non_main(){
+    local img_name="$1"
+    local base=$(basename "$img_name" .img)
+    local sub_img=$(ls "/media/$base/"*.img)
+    local device=$(losetup -j "$sub_img" | awk -F':' '{print $1}')
+    sudo umount $sub_img
+    sudo losetup -d $device
+    sudo rmdir "/media/$base"
+    sudo umount "/media/"
+    sudo losetup -d $device
+    sudo rmdir "/media/$base"
+}
+
+main "$@"
